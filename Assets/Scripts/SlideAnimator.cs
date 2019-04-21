@@ -11,7 +11,8 @@ public class SlideAnimator : MonoBehaviour
     public GameObject Rand;
     public GameObject Rule;
 
-    IEnumerator TimerTheme(){
+    IEnumerator TimerTheme()
+    {
         yield return new WaitForSeconds(0.4f);
         Theme.SetActive(false);
     }
@@ -73,5 +74,9 @@ public class SlideAnimator : MonoBehaviour
     {
         anim.SetBool("Active", false);
         StartCoroutine("TimerRule");
+    }
+    public void OnExitClick()
+    {
+        Application.Quit();
     }
 }
