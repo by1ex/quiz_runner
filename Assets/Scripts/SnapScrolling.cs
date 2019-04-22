@@ -103,7 +103,26 @@ public class SnapScrolling : MonoBehaviour
 
     public void OnClickToStartExam()
     {
+        int[] indexTheme = new int[29];
+        questions = new Questions[20];
+        int i = 0;
+        while (i < 4)
+        {
+            int randTheme = Random.Range(1, 5);
+            if (indexTheme[randTheme] == 0)
+            {
+                int randQuestion = Random.Range(0, theme[randTheme].Questions.ToArray().Length - 5);
+                indexTheme[randTheme] = 1;
+                for (int j = 0; j < 5; j++)
+                {
+                    questions[i * 5 + j] = theme[randTheme].Questions[randQuestion + j];
+                }
+                i++;
+            }
+        }
+        Fill(questions.Length);
         anim.SetBool("Active", true);
+        HeaderText.text = "Экзамен";
     }
 
     public void OnClickToStartRand()
