@@ -5,8 +5,7 @@ using UnityEngine.UI;
 
 public class SnapScrolling : MonoBehaviour
 {
-    [Range(1,20)]
-    public int count=0;
+    private int count=0;
     [Header("Main")]
     public Transform content;
     private GameObject[] instPans;
@@ -17,6 +16,7 @@ public class SnapScrolling : MonoBehaviour
     private RectTransform contentRect;
     private Vector2 contentVector;
 
+    public Text HeaderText;
 
     public float snapSpeed;
     private int selectedPanID;
@@ -24,6 +24,11 @@ public class SnapScrolling : MonoBehaviour
 
     private GameObject TicketObj;
     private Animator anim;
+
+    private Questions[] questions;
+    private Questions[] ticket;
+    private Ticket[] theme;
+
 
     IEnumerator Timer()
     {
@@ -46,20 +51,34 @@ public class SnapScrolling : MonoBehaviour
 
     private void Start()
     {
+        theme = Camera.main.GetComponent<JsonParsing>().Theme;
         TicketObj = this.gameObject;
         anim = TicketObj.GetComponent<Animator>();
         panOffset = Screen.width;
         contentRect = content.GetComponent<RectTransform>();
         instPans = new GameObject[count];
         pansPos = new Vector2[count];
+    }
+
+    private void Fill(int leng)
+    {
         for (int i = 0; i < count; i++)
         {
+            Destroy(instPans[i]);
+        }
+        instPans = new GameObject[leng];
+        pansPos = new Vector2[leng];
+        for (int i = 0; i < leng; i++)
+        {
             instPans[i] = (GameObject)Instantiate(QuestionPref, content.transform, false);
+            int tmp = i;
             if (i == 0) continue;
             instPans[i].transform.localPosition = new Vector2(instPans[i - 1].transform.localPosition.x + panOffset, instPans[i - 1].transform.localPosition.y);
             pansPos[i] = -instPans[i].transform.localPosition;
         }
+        count = leng;
     }
+
     private void FixedUpdate()
     {
         if (count <= 0) return;
@@ -92,9 +111,27 @@ public class SnapScrolling : MonoBehaviour
         anim.SetBool("Active", true);
     }
 
-    public void OnClickToStartTheme()
+    public void OnClickToStartTheme(int indexAll)
     {
+        int indexTheme = indexAll / 10;
+        int index = indexAll % 10;
+        ticket = theme[indexTheme].Questions.ToArray();
+        if (ticket.Length - 20 * index <= 0) return;
+        if (ticket.Length <= 20 * (index + 1))
+        {
+            questions = new Questions[ticket.Length - 20 * index];
+            for (int i = index * 20, j = 0; i < ticket.Length; i++, j++)
+                questions[j] = ticket[i];
+        }
+        else if (ticket.Length > 20 * (index + 1))
+        {
+            questions = new Questions[20];
+            for (int i = 20 * (index), j = 0; j < 20; i++, j++)
+                questions[j] = ticket[i];
+        }
+        Fill(questions.Length);
         anim.SetBool("Active", true);
+        HeaderText.text = "Тема: " + indexTheme.ToString() + " Билет: " + (index + 1).ToString();
     }
 
     public void Scrolling(bool scroll)
