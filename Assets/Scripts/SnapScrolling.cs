@@ -16,10 +16,23 @@ public class SnapScrolling : MonoBehaviour
     private RectTransform contentRect;
     private Vector2 contentVector;
 
+    [Header("Box")]
+    public GameObject BoxPref;
+    public Transform BoxParentTransform;
+    private int boxOffset;
+    private GameObject[] instBoxes;
+    private float[] boxRect;
+    private Image[] imagesBoxes;
+    private RectTransform boxContentRect;
+    private Vector2 boxContentVector;
+    private ScrollRect boxScrollRect;
+
     public Text HeaderText;
 
     public float snapSpeed;
     private int selectedPanID;
+    private int prevSelectedPanID;
+
     private bool isScrolling;
 
     private GameObject TicketObj;
@@ -34,8 +47,12 @@ public class SnapScrolling : MonoBehaviour
     {
         yield return new WaitForSeconds(0.4f);
         Destroy(instPans[selectedPanID]);
-        count = 0;
         contentRect.anchoredPosition = new Vector2(0, 0);
+        for (int i = 0; i < count; i++)
+        {
+            Destroy(instBoxes[i]);
+        }
+        count = 0;
     }
 
     public void OnThemeUnclick()
@@ -54,7 +71,10 @@ public class SnapScrolling : MonoBehaviour
         theme = Camera.main.GetComponent<JsonParsing>().Theme;
         TicketObj = this.gameObject;
         anim = TicketObj.GetComponent<Animator>();
+        boxContentRect = BoxParentTransform.GetComponent<RectTransform>();
         panOffset = Screen.width;
+        boxOffset = Mathf.FloorToInt((float)Screen.width / 500.0f * (float)50);
+        boxScrollRect = BoxParentTransform.GetComponentInParent<ScrollRect>();
         contentRect = content.GetComponent<RectTransform>();
         instPans = new GameObject[count];
         pansPos = new Vector2[count];
@@ -65,15 +85,23 @@ public class SnapScrolling : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Destroy(instPans[i]);
+            Destroy(instBoxes[i]);
         }
         instPans = new GameObject[leng];
         pansPos = new Vector2[leng];
+        instBoxes = new GameObject[leng];
+        boxRect = new float[leng];
+        imagesBoxes = new Image[leng];
         for (int i = 0; i < leng; i++)
         {
             instPans[i] = (GameObject)Instantiate(QuestionPref, content.transform, false);
-            int tmp = i;
+            instBoxes[i] = (GameObject)Instantiate(BoxPref, BoxParentTransform, false);
+            imagesBoxes[i] = instBoxes[i].GetComponent<Image>();
             if (i == 0) continue;
+            instBoxes[i].transform.localPosition = new Vector2(instBoxes[i - 1].transform.localPosition.x + boxOffset, instBoxes[i - 1].transform.localPosition.y);
+            instBoxes[i].GetComponentInChildren<Text>().text = (i + 1).ToString();
             instPans[i].transform.localPosition = new Vector2(instPans[i - 1].transform.localPosition.x + panOffset, instPans[i - 1].transform.localPosition.y);
+            boxRect[i] = instBoxes[i].GetComponent<RectTransform>().anchoredPosition.x;
             pansPos[i] = -instPans[i].transform.localPosition;
         }
         count = leng;
@@ -94,11 +122,40 @@ public class SnapScrolling : MonoBehaviour
                 selectedPanID = i;
             }
         }
-
         if (isScrolling) return;
-        contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
-        contentRect.anchoredPosition = contentVector;
-        
+        if (boxRect[count - 1] > panOffset + 15)
+        {
+            if (Mathf.Abs(boxContentRect.anchoredPosition.x) > boxRect[count - 1] - panOffset + boxOffset)
+            {
+                boxScrollRect.horizontal = false;
+                boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, -boxRect[count - 1] + panOffset - boxOffset / 2, snapSpeed * Time.fixedDeltaTime);
+                boxContentRect.anchoredPosition = boxContentVector;
+            }
+            else boxScrollRect.horizontal = true;
+        }
+        if (boxContentRect.anchoredPosition.x > 15)
+        {
+            boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, boxRect[0], snapSpeed * Time.fixedDeltaTime);
+            boxContentRect.anchoredPosition = boxContentVector;
+        }
+        imagesBoxes[prevSelectedPanID].enabled = false;
+        if (boxContentRect.anchoredPosition.x + boxRect[selectedPanID] > panOffset - (float)boxOffset * 1.0f)
+        {
+            boxContentVector.x = -(boxRect[selectedPanID] - panOffset + boxOffset);
+            boxContentRect.anchoredPosition = boxContentVector;
+        }
+        else if (boxContentRect.anchoredPosition.x < -boxRect[selectedPanID])
+        {
+            boxContentVector.x = -boxRect[selectedPanID];
+            boxContentRect.anchoredPosition = boxContentVector;
+        }
+        else
+        {
+            contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
+            contentRect.anchoredPosition = contentVector;
+        }
+        prevSelectedPanID = selectedPanID;
+        imagesBoxes[selectedPanID].enabled = true;
     }
 
     public void OnClickToStartExam()
