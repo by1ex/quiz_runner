@@ -22,10 +22,32 @@ public class SnapScrolling : MonoBehaviour
     private int selectedPanID;
     private bool isScrolling;
 
+    private GameObject TicketObj;
+    private Animator anim;
 
-    
+    IEnumerator Timer()
+    {
+        yield return new WaitForSeconds(0.4f);
+        Destroy(instPans[selectedPanID]);
+        count = 0;
+        contentRect.anchoredPosition = new Vector2(0, 0);
+    }
+
+    public void OnThemeUnclick()
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (i == selectedPanID) continue;
+            Destroy(instPans[i]);
+        }
+        anim.SetBool("Active", false);
+        StartCoroutine("Timer");
+    }
+
     private void Start()
     {
+        TicketObj = this.gameObject;
+        anim = TicketObj.GetComponent<Animator>();
         panOffset = Screen.width;
         contentRect = content.GetComponent<RectTransform>();
         instPans = new GameObject[count];
@@ -40,6 +62,7 @@ public class SnapScrolling : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (count <= 0) return;
         if (contentRect.anchoredPosition.x > pansPos[0].x + 1 || contentRect.anchoredPosition.x < pansPos[count - 1].x - 1) scrollRect.horizontal = false;
         else scrollRect.horizontal = true;
         float nearestPos = float.MaxValue;
@@ -57,6 +80,21 @@ public class SnapScrolling : MonoBehaviour
         contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
         contentRect.anchoredPosition = contentVector;
         
+    }
+
+    public void OnClickToStartExam()
+    {
+        anim.SetBool("Active", true);
+    }
+
+    public void OnClickToStartRand()
+    {
+        anim.SetBool("Active", true);
+    }
+
+    public void OnClickToStartTheme()
+    {
+        anim.SetBool("Active", true);
     }
 
     public void Scrolling(bool scroll)
