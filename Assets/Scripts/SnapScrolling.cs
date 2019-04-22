@@ -23,7 +23,7 @@ public class SnapScrolling : MonoBehaviour
     private bool isScrolling;
 
 
-
+    
     private void Start()
     {
         panOffset = Screen.width;
@@ -40,6 +40,8 @@ public class SnapScrolling : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (contentRect.anchoredPosition.x > pansPos[0].x + 1 || contentRect.anchoredPosition.x < pansPos[count - 1].x - 1) scrollRect.horizontal = false;
+        else scrollRect.horizontal = true;
         float nearestPos = float.MaxValue;
         for (int i = 0; i < count; i++)
         {
