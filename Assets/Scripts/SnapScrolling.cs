@@ -49,6 +49,9 @@ public class SnapScrolling : MonoBehaviour
     public Color enableWrongColor;
     public Color enableRightColor;
 
+    private int countWrong;
+    private int countRight;
+
     IEnumerator Timer()
     {
         yield return new WaitForSeconds(0.4f);
@@ -150,8 +153,18 @@ public class SnapScrolling : MonoBehaviour
             boxContentRect.anchoredPosition = boxContentVector;
         }
 
+        else if (imagesBoxes[prevSelectedPanID].color == enableWrongColor)
+        {
+            imagesBoxes[prevSelectedPanID].color = wrongColor;
+        }
+        else if (imagesBoxes[prevSelectedPanID].color == enableRightColor)
+        {
+            imagesBoxes[prevSelectedPanID].color = rightColor;
+        }
+        else
+        {
             imagesBoxes[prevSelectedPanID].enabled = false;
-        
+        }
 
         if (boxContentRect.anchoredPosition.x + boxRect[selectedPanID] > panOffset - boxOffset)
         {
@@ -184,9 +197,40 @@ public class SnapScrolling : MonoBehaviour
             }
         }
         prevSelectedPanID = selectedPanID;
-
+        if (imagesBoxes[selectedPanID].color == wrongColor)
+        {
+            imagesBoxes[selectedPanID].color = enableWrongColor;
+        }
+        else if (imagesBoxes[selectedPanID].color == rightColor)
+        {
+            imagesBoxes[selectedPanID].color = enableRightColor;
+        }
+        else
+        {
             imagesBoxes[selectedPanID].enabled = true;
-        
+        }
+
+    }
+
+
+    public void ChangeColor(int index)
+    {
+        if (index == 0)
+        {
+            imagesBoxes[selectedPanID].color = enableWrongColor;
+            countWrong++;
+        }
+        else if (index == 1)
+        {
+            imagesBoxes[selectedPanID].color = enableRightColor;
+            if (selectedPanID < count - 1)
+            {
+                contentRect.anchoredPosition -= new Vector2(panOffset - boxOffset * 3, 0);
+                HPPanID = ++selectedPanID;
+            }
+            countRight++;
+        }
+
     }
 
     private void OnClick(int index)

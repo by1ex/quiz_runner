@@ -10838,6 +10838,10 @@ MonoBehaviour:
   BoxParentTransform: {fileID: 296458847}
   HeaderText: {fileID: 1345253165}
   snapSpeed: 25
+  wrongColor: {r: 0.7921569, g: 0.27569243, b: 0.24313724, a: 0.39215687}
+  rightColor: {r: 0.24313724, g: 0.7921569, b: 0.34848678, a: 0.39215687}
+  enableWrongColor: {r: 0.7921569, g: 0.27569243, b: 0.24313724, a: 0.78431374}
+  enableRightColor: {r: 0.24313724, g: 0.7921569, b: 0.34848678, a: 0.78431374}
 --- !u!95 &1087241679
 Animator:
   serializedVersion: 3
