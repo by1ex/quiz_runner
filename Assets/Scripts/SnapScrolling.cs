@@ -44,6 +44,11 @@ public class SnapScrolling : MonoBehaviour
     private Ticket[] theme;
 
 
+    public Color wrongColor;
+    public Color rightColor;
+    public Color enableWrongColor;
+    public Color enableRightColor;
+
     IEnumerator Timer()
     {
         yield return new WaitForSeconds(0.4f);
@@ -98,9 +103,10 @@ public class SnapScrolling : MonoBehaviour
         {
             instPans[i] = (GameObject)Instantiate(QuestionPref, content.transform, false);
             instBoxes[i] = (GameObject)Instantiate(BoxPref, BoxParentTransform, false);
-            imagesBoxes[i] = instBoxes[i].GetComponent<Image>();
             int tmp = i;
             instBoxes[i].GetComponent<Button>().onClick.AddListener(() => OnClick(tmp));
+            instPans[i].GetComponent<QuestionController>().question = questions[i];
+            imagesBoxes[i] = instBoxes[i].GetComponent<Image>();
             if (i == 0) continue;
             instBoxes[i].transform.localPosition = new Vector2(instBoxes[i - 1].transform.localPosition.x + boxOffset, instBoxes[i - 1].transform.localPosition.y);
             instBoxes[i].GetComponentInChildren<Text>().text = (i + 1).ToString();
@@ -108,7 +114,6 @@ public class SnapScrolling : MonoBehaviour
             boxRect[i] = instBoxes[i].GetComponent<RectTransform>().anchoredPosition.x;
             pansPos[i] = -instPans[i].transform.localPosition;
         }
-        imagesBoxes[0].enabled = true;
         count = leng;
     }
 
@@ -145,7 +150,9 @@ public class SnapScrolling : MonoBehaviour
             boxContentRect.anchoredPosition = boxContentVector;
         }
 
-        imagesBoxes[prevSelectedPanID].enabled = false;
+            imagesBoxes[prevSelectedPanID].enabled = false;
+        
+
         if (boxContentRect.anchoredPosition.x + boxRect[selectedPanID] > panOffset - boxOffset)
         {
             if (prevSelectedPanID != selectedPanID || boxContentRect.anchoredPosition.x == 0)
@@ -177,7 +184,9 @@ public class SnapScrolling : MonoBehaviour
             }
         }
         prevSelectedPanID = selectedPanID;
-        imagesBoxes[selectedPanID].enabled = true;
+
+            imagesBoxes[selectedPanID].enabled = true;
+        
     }
 
     private void OnClick(int index)
