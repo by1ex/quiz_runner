@@ -31,6 +31,7 @@ public class SnapScrolling : MonoBehaviour
 
     public float snapSpeed;
     private int selectedPanID;
+    private int HPPanID;
     private int prevSelectedPanID;
 
     private bool isScrolling;
@@ -82,6 +83,7 @@ public class SnapScrolling : MonoBehaviour
 
     private void Fill(int leng)
     {
+        HPPanID = 0;
         for (int i = 0; i < count; i++)
         {
             Destroy(instPans[i]);
@@ -97,6 +99,8 @@ public class SnapScrolling : MonoBehaviour
             instPans[i] = (GameObject)Instantiate(QuestionPref, content.transform, false);
             instBoxes[i] = (GameObject)Instantiate(BoxPref, BoxParentTransform, false);
             imagesBoxes[i] = instBoxes[i].GetComponent<Image>();
+            int tmp = i;
+            instBoxes[i].GetComponent<Button>().onClick.AddListener(() => OnClick(tmp));
             if (i == 0) continue;
             instBoxes[i].transform.localPosition = new Vector2(instBoxes[i - 1].transform.localPosition.x + boxOffset, instBoxes[i - 1].transform.localPosition.y);
             instBoxes[i].GetComponentInChildren<Text>().text = (i + 1).ToString();
@@ -104,6 +108,7 @@ public class SnapScrolling : MonoBehaviour
             boxRect[i] = instBoxes[i].GetComponent<RectTransform>().anchoredPosition.x;
             pansPos[i] = -instPans[i].transform.localPosition;
         }
+        imagesBoxes[0].enabled = true;
         count = leng;
     }
 
@@ -123,39 +128,69 @@ public class SnapScrolling : MonoBehaviour
             }
         }
         if (isScrolling) return;
-        if (boxRect[count - 1] > panOffset + 15)
+        if (boxRect[count - 1] > panOffset - 5)
         {
-            if (Mathf.Abs(boxContentRect.anchoredPosition.x) > boxRect[count - 1] - panOffset + boxOffset)
+            if (Mathf.Abs(boxContentRect.anchoredPosition.x) > boxRect[count - 1] - panOffset + boxOffset + 5) 
             {
                 boxScrollRect.horizontal = false;
-                boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, -boxRect[count - 1] + panOffset - boxOffset / 2, snapSpeed * Time.fixedDeltaTime);
+                boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, -boxRect[count - 1] + panOffset - boxOffset , snapSpeed * Time.fixedDeltaTime);
                 boxContentRect.anchoredPosition = boxContentVector;
             }
             else boxScrollRect.horizontal = true;
         }
-        if (boxContentRect.anchoredPosition.x > 15)
+        if (boxContentRect.anchoredPosition.x > 5)
         {
+            
             boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, boxRect[0], snapSpeed * Time.fixedDeltaTime);
             boxContentRect.anchoredPosition = boxContentVector;
         }
+
         imagesBoxes[prevSelectedPanID].enabled = false;
-        if (boxContentRect.anchoredPosition.x + boxRect[selectedPanID] > panOffset - (float)boxOffset * 1.0f)
+        if (boxContentRect.anchoredPosition.x + boxRect[selectedPanID] > panOffset - boxOffset)
         {
-            boxContentVector.x = -(boxRect[selectedPanID] - panOffset + boxOffset);
+            if (prevSelectedPanID != selectedPanID || boxContentRect.anchoredPosition.x == 0)
+                boxContentVector.x = -(boxRect[selectedPanID] - panOffset + boxOffset);
+            else
+                boxContentVector.x = boxContentRect.anchoredPosition.x;
             boxContentRect.anchoredPosition = boxContentVector;
         }
         else if (boxContentRect.anchoredPosition.x < -boxRect[selectedPanID])
         {
-            boxContentVector.x = -boxRect[selectedPanID];
+            if (prevSelectedPanID != selectedPanID)
+                boxContentVector.x = -boxRect[selectedPanID];
+            else
+                boxContentVector.x = boxContentRect.anchoredPosition.x;
             boxContentRect.anchoredPosition = boxContentVector;
         }
         else
         {
-            contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
-            contentRect.anchoredPosition = contentVector;
+            if (HPPanID != 0)
+            {
+                contentRect.anchoredPosition = new Vector2(pansPos[HPPanID].x + boxOffset, 0);
+                selectedPanID = HPPanID;
+                HPPanID = 0;
+            }
+            else
+            {
+                contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
+                contentRect.anchoredPosition = contentVector;
+            }
         }
         prevSelectedPanID = selectedPanID;
         imagesBoxes[selectedPanID].enabled = true;
+    }
+
+    private void OnClick(int index)
+    {
+        if (index > selectedPanID)
+        {
+            contentRect.anchoredPosition = new Vector2(pansPos[index].x + boxOffset, 0); 
+            if (selectedPanID == 0) HPPanID = index;
+        }
+        else if (index < selectedPanID)
+        {
+            contentRect.anchoredPosition = new Vector2(pansPos[index].x - boxOffset, 0);
+        }
     }
 
     public void OnClickToStartExam()
