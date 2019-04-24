@@ -97,6 +97,7 @@ public class SnapScrolling : MonoBehaviour
 
     private void Fill(int leng)
     {
+        
         HPPanID = 0;
         for (int i = 0; i < count; i++)
         {
@@ -306,6 +307,7 @@ public class SnapScrolling : MonoBehaviour
 
     public void OnClickToStartRand()
     {
+        isExam = false;
         int[] indexTheme = new int[29];
         int[] indexQuestions = new int[200];
         questions = new Questions[20];
@@ -329,6 +331,7 @@ public class SnapScrolling : MonoBehaviour
 
     public void OnClickToStartTheme(int indexAll)
     {
+        isExam = false;
         int indexTheme = indexAll / 10;
         int index = indexAll % 10;
         ticket = theme[indexTheme].Questions.ToArray();
