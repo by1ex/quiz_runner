@@ -16,6 +16,7 @@ public class QuestionController : MonoBehaviour
 
     public Color wrongColor;
     public Color rightColor;
+    public Color neutralColor;
 
     private int answerInt;
 
@@ -44,9 +45,15 @@ public class QuestionController : MonoBehaviour
         {
             for (int i = 0; i < question.opt.Length; i++)
                 answer[i].GetComponent<Button>().interactable = false;
-
-            answer[index - 1].GetComponent<Image>().color = rightColor;
-            answer[index - 1].transform.GetChild(1).GetComponent<Image>().sprite = Right;
+            if (!snap.isExam)
+            {
+                answer[index - 1].GetComponent<Image>().color = rightColor;
+                answer[index - 1].transform.GetChild(1).GetComponent<Image>().sprite = Right;
+            }
+            else
+            {
+                answer[index - 1].GetComponent<Image>().color = neutralColor;
+            }
             snap.ChangeColor(1);
         }
         else
@@ -55,14 +62,21 @@ public class QuestionController : MonoBehaviour
             {
                 answer[i].GetComponent<Button>().interactable = false;
                 if (i == answerInt - 1) continue;
-               
+                if (!snap.isExam)
+                {
                     answer[i].GetComponent<Image>().color = wrongColor;
                     answer[i].transform.GetChild(1).GetComponent<Image>().sprite = Wrong;
-                
+                }
             }
-         
-            answer[answerInt - 1].GetComponent<Image>().color = rightColor;
-            answer[answerInt - 1].transform.GetChild(1).GetComponent<Image>().sprite = Right;
+            if (!snap.isExam)
+            {
+                answer[answerInt - 1].GetComponent<Image>().color = rightColor;
+                answer[answerInt - 1].transform.GetChild(1).GetComponent<Image>().sprite = Right;
+            }
+            else
+            {
+                answer[index - 1].GetComponent<Image>().color = neutralColor;
+            }
             snap.ChangeColor(0);
         }
     }

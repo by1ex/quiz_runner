@@ -10842,6 +10842,9 @@ MonoBehaviour:
   rightColor: {r: 0.24313724, g: 0.7921569, b: 0.34848678, a: 0.39215687}
   enableWrongColor: {r: 0.7921569, g: 0.27569243, b: 0.24313724, a: 0.78431374}
   enableRightColor: {r: 0.24313724, g: 0.7921569, b: 0.34848678, a: 0.78431374}
+  neutralColor: {r: 0.29411766, g: 0.29411766, b: 0.29411766, a: 0.39215687}
+  enableNeutralColor: {r: 0.29411766, g: 0.29411766, b: 0.29411766, a: 0.78431374}
+  isExam: 0
 --- !u!95 &1087241679
 Animator:
   serializedVersion: 3

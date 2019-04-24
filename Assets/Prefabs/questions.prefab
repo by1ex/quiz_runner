@@ -443,6 +443,7 @@ MonoBehaviour:
   QuestionImage: {fileID: 2797170006634804085}
   wrongColor: {r: 0.7921569, g: 0.27569243, b: 0.24313724, a: 0.6784314}
   rightColor: {r: 0.24313724, g: 0.7921569, b: 0.34848678, a: 0.6784314}
+  neutralColor: {r: 0.29411766, g: 0.29411766, b: 0.29411766, a: 0.78431374}
 --- !u!1 &2489614179082882272
 GameObject:
   m_ObjectHideFlags: 0

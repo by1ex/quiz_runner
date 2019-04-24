@@ -48,19 +48,25 @@ public class SnapScrolling : MonoBehaviour
     public Color rightColor;
     public Color enableWrongColor;
     public Color enableRightColor;
+    public Color neutralColor;
+    public Color enableNeutralColor;
 
     private int countWrong;
     private int countRight;
+
+    public bool isExam = false;
 
     IEnumerator Timer()
     {
         yield return new WaitForSeconds(0.4f);
         Destroy(instPans[selectedPanID]);
-        contentRect.anchoredPosition = new Vector2(0, 0);
         for (int i = 0; i < count; i++)
         {
             Destroy(instBoxes[i]);
         }
+        contentRect.anchoredPosition = new Vector2(0, 0);
+        prevSelectedPanID = 0;
+        boxContentRect.anchoredPosition = new Vector2(0, 0);
         count = 0;
     }
 
@@ -153,6 +159,10 @@ public class SnapScrolling : MonoBehaviour
             boxContentRect.anchoredPosition = boxContentVector;
         }
 
+        if (imagesBoxes[prevSelectedPanID].color == enableNeutralColor)
+        {
+            imagesBoxes[prevSelectedPanID].color = neutralColor;
+        }
         else if (imagesBoxes[prevSelectedPanID].color == enableWrongColor)
         {
             imagesBoxes[prevSelectedPanID].color = wrongColor;
@@ -197,7 +207,11 @@ public class SnapScrolling : MonoBehaviour
             }
         }
         prevSelectedPanID = selectedPanID;
-        if (imagesBoxes[selectedPanID].color == wrongColor)
+        if (imagesBoxes[prevSelectedPanID].color == neutralColor)
+        {
+            imagesBoxes[prevSelectedPanID].color = enableNeutralColor;
+        }
+        else if (imagesBoxes[selectedPanID].color == wrongColor)
         {
             imagesBoxes[selectedPanID].color = enableWrongColor;
         }
@@ -217,18 +231,37 @@ public class SnapScrolling : MonoBehaviour
     {
         if (index == 0)
         {
-            imagesBoxes[selectedPanID].color = enableWrongColor;
+            if (!isExam)
+            {
+                imagesBoxes[selectedPanID].color = enableWrongColor;
+            }
+            else
+            {
+                imagesBoxes[selectedPanID].color = enableNeutralColor;
+                if (selectedPanID < count - 1)
+                {
+                    contentRect.anchoredPosition -= new Vector2(panOffset - boxOffset * 3, 0);
+                    HPPanID = ++selectedPanID;
+                }
+            }
             countWrong++;
         }
         else if (index == 1)
         {
-            imagesBoxes[selectedPanID].color = enableRightColor;
+            if (!isExam)
+            {
+                imagesBoxes[selectedPanID].color = enableRightColor;
+            }
+            else
+            {
+                imagesBoxes[selectedPanID].color = enableNeutralColor;
+            }
+            countRight++;
             if (selectedPanID < count - 1)
             {
                 contentRect.anchoredPosition -= new Vector2(panOffset - boxOffset * 3, 0);
                 HPPanID = ++selectedPanID;
             }
-            countRight++;
         }
 
     }
@@ -248,6 +281,7 @@ public class SnapScrolling : MonoBehaviour
 
     public void OnClickToStartExam()
     {
+        isExam = true;
         int[] indexTheme = new int[29];
         questions = new Questions[20];
         int i = 0;
