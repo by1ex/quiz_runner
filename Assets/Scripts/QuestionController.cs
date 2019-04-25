@@ -14,11 +14,16 @@ public class QuestionController : MonoBehaviour
     public Image QuestionImage;
     private SnapScrolling snap;
 
+    public int numToTransfer;
+    public float offsetText;
+    public float offsetBetweenText;
+
     public Color wrongColor;
     public Color rightColor;
     public Color neutralColor;
 
     private int answerInt;
+
 
     void Start()
     {
@@ -28,11 +33,33 @@ public class QuestionController : MonoBehaviour
         answer[1].SetActive(false);
         answer[2].SetActive(false);
         answer[3].SetActive(false);
-        QuestionImage.sprite = Resources.Load<Sprite>(question.url);
+        if (question.url != "001")
+        {
+            QuestionImage.sprite = Resources.Load<Sprite>(question.url);
+            Question.GetComponent<RectTransform>().offsetMin = new Vector2(0, (3 - question.text.Length / numToTransfer) * offsetText);
+        }
+        else
+        {
+            Destroy(QuestionImage.gameObject);
+            Question.GetComponent<RectTransform>().offsetMax = new Vector2(0, 180);
+            Question.GetComponent<RectTransform>().offsetMin = new Vector2(0, (3 - question.text.Length / numToTransfer) * offsetText+180);
+        }
         Question.text = question.text;
+
+
         for (int i = 0; i < question.opt.Length; i++)
         {
             answer[i].SetActive(true);
+            if (i == 0)
+            {
+                answer[i].GetComponent<RectTransform>().offsetMax = new Vector2(0, Question.GetComponent<RectTransform>().offsetMin.y);
+                answer[i].GetComponent<RectTransform>().offsetMin = new Vector2(0, (3 - question.opt[i].Length / numToTransfer) * offsetText + Question.GetComponent<RectTransform>().offsetMin.y);
+            }
+            if (i != 0)
+            {
+                answer[i].GetComponent<RectTransform>().offsetMax = new Vector2(0, (answer[i - 1].GetComponent<RectTransform>().offsetMin.y) - offsetBetweenText);
+                answer[i].GetComponent<RectTransform>().offsetMin = new Vector2(0, (3 - question.opt[i].Length / numToTransfer) * offsetText + (answer[i - 1].GetComponent<RectTransform>().offsetMin.y) - offsetBetweenText);
+            }
             answer[i].GetComponentInChildren<Text>().text = question.opt[i];
             int t = i + 1;
             answer[i].GetComponent<Button>().onClick.AddListener(() => OnClick(t));
