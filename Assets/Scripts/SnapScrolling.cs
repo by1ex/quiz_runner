@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class SnapScrolling : MonoBehaviour
 {
+    [SerializeField]
+    private Timer timer;
+    private GameObject timerObj;
+
     private int count=0;
     [Header("Main")]
     public Transform content;
@@ -93,6 +97,8 @@ public class SnapScrolling : MonoBehaviour
         contentRect = content.GetComponent<RectTransform>();
         instPans = new GameObject[count];
         pansPos = new Vector2[count];
+        timer = GetComponent<Timer>();
+        timerObj = timer.TextTimer.GetComponentInParent<Image>().gameObject;
     }
 
     private void Fill(int leng)
@@ -125,6 +131,7 @@ public class SnapScrolling : MonoBehaviour
             pansPos[i] = -instPans[i].transform.localPosition;
         }
         count = leng;
+        timerObj.SetActive(isExam);
     }
 
     private void FixedUpdate()
@@ -283,6 +290,7 @@ public class SnapScrolling : MonoBehaviour
     public void OnClickToStartExam()
     {
         isExam = true;
+        timer.Starting(1201f);
         int[] indexTheme = new int[29];
         questions = new Questions[20];
         int i = 0;
