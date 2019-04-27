@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class Timer : MonoBehaviour
 {
-
-    private float secondsTime;
+    [HideInInspector]
+    public float secondsTime;
 
     public Text TextTimer;
     private SnapScrolling win;

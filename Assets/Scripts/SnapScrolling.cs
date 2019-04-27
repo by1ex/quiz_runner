@@ -8,6 +8,7 @@ public class SnapScrolling : MonoBehaviour
     [SerializeField]
     private Timer timer;
     private GameObject timerObj;
+    public float startingTime;
 
     private int count=0;
     [Header("Main")]
@@ -60,6 +61,7 @@ public class SnapScrolling : MonoBehaviour
     public Color neutralColor;
     public Color enableNeutralColor;
 
+    //The number of correct and incorrect answers
     private int countWrong;
     private int countRight;
 
@@ -87,14 +89,14 @@ public class SnapScrolling : MonoBehaviour
             Destroy(instPans[i]);
         }
         anim.SetBool("Active", false);
-        StartCoroutine("Timer");
         winAnim.SetBool("Active", false);
+        StartCoroutine("Timer");
     }
 
     public void Win()
     {
         timer.start = false;
-        winObj.GetComponent<StatsContoller>().Change(countRight, count);
+        winObj.GetComponent<StatsContoller>().Change(countRight, count, startingTime - timer.secondsTime - 1);
         winAnim.SetBool("Active", true);
     }
 
@@ -310,7 +312,7 @@ public class SnapScrolling : MonoBehaviour
     public void OnClickToStartExam()
     {
         isExam = true;
-        timer.Starting(1201f);
+        timer.Starting(startingTime);
         int[] indexTheme = new int[29];
         questions = new Questions[20];
         int i = 0;

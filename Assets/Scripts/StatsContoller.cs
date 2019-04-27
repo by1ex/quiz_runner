@@ -7,24 +7,26 @@ public class StatsContoller : MonoBehaviour
 {
     public Text Header;
     public Text Stats;
+    public Text Time;
 
     private Sprite tmpSprite;
-    public Image ResImage;
+    public Image Result;
 
-    public void Change(int positive, int count)
+    public void Change(int positive, int count, float time)
     {
         if (count - positive <= 2)
         {
             Header.text = "Билет решен";
             tmpSprite = Resources.Load<Sprite>("win");
-            ResImage.sprite = tmpSprite;
+            Result.sprite = tmpSprite;
         }
         else
         {
             Header.text = "Билет не решен";
             tmpSprite = Resources.Load<Sprite>("lose");
-            ResImage.sprite = tmpSprite;
+            Result.sprite = tmpSprite;
         }
         Stats.text = "Результат: " + positive.ToString() + " / " + count.ToString();
+        Time.text =  "Время: " + string.Format("{00:00}:{01:00}", (int)(time / 60), (int)(time % 60));
     }
 }
