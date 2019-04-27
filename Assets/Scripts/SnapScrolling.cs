@@ -94,6 +94,7 @@ public class SnapScrolling : MonoBehaviour
     public void Win()
     {
         timer.start = false;
+        winObj.GetComponent<StatsContoller>().Change(countRight, count);
         winAnim.SetBool("Active", true);
     }
 
