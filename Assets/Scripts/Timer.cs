@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class Timer : MonoBehaviour
 {
 
-    private float secondsTime = 0f;
+    private float secondsTime;
 
     public Text TextTimer;
     private SnapScrolling win;
 
     bool flag = true;
-    private bool start = false;
+    public bool start = false;
 
     public Color clrStart;
     public Color clrEnd;
@@ -47,6 +47,7 @@ public class Timer : MonoBehaviour
                 {
                     start = false;
                     flag = false;
+                    win.Win();
                 }
 
             }

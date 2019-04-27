@@ -40,8 +40,13 @@ public class SnapScrolling : MonoBehaviour
 
     private bool isScrolling;
 
-    private GameObject TicketObj;
+    //animator controller for animation Ticket
+    public GameObject TicketObj;
     private Animator anim;
+
+    //animator controller for animation Win Panel
+    public GameObject winObj;
+    private Animator winAnim;
 
     private Questions[] questions;
     private Questions[] ticket;
@@ -83,11 +88,19 @@ public class SnapScrolling : MonoBehaviour
         }
         anim.SetBool("Active", false);
         StartCoroutine("Timer");
+        winAnim.SetBool("Active", false);
+    }
+
+    public void Win()
+    {
+        timer.start = false;
+        winAnim.SetBool("Active", true);
     }
 
     private void Start()
     {
         theme = Camera.main.GetComponent<JsonParsing>().Theme;
+        winAnim = winObj.GetComponent<Animator>();
         TicketObj = this.gameObject;
         anim = TicketObj.GetComponent<Animator>();
         boxContentRect = BoxParentTransform.GetComponent<RectTransform>();
@@ -137,6 +150,12 @@ public class SnapScrolling : MonoBehaviour
     private void FixedUpdate()
     {
         if (count <= 0) return;
+        if (countRight + countWrong == count)
+        {
+            Win();
+            countRight = 0;
+            countWrong = 0;
+        }
         if (contentRect.anchoredPosition.x > pansPos[0].x + 1 || contentRect.anchoredPosition.x < pansPos[count - 1].x - 1) scrollRect.horizontal = false;
         else scrollRect.horizontal = true;
         float nearestPos = float.MaxValue;
