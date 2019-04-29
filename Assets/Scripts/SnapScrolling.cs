@@ -21,6 +21,7 @@ public class SnapScrolling : MonoBehaviour
     private RectTransform contentRect;
     private Vector2 contentVector;
 
+
     [Header("Box")]
     public GameObject BoxPref;
     public Transform BoxParentTransform;
@@ -67,6 +68,14 @@ public class SnapScrolling : MonoBehaviour
 
     public bool isExam = false;
 
+    private Camera cam;
+    private Vector2 startPos;
+    private Vector2 endPos;
+
+    private bool panning;
+
+
+
     IEnumerator Timer()
     {
         yield return new WaitForSeconds(0.4f);
@@ -102,6 +111,7 @@ public class SnapScrolling : MonoBehaviour
 
     private void Start()
     {
+        cam = Camera.main;
         theme = Camera.main.GetComponent<JsonParsing>().Theme;
         winAnim = winObj.GetComponent<Animator>();
         TicketObj = this.gameObject;
@@ -119,13 +129,8 @@ public class SnapScrolling : MonoBehaviour
 
     private void Fill(int leng)
     {
-        
+        selectedPanID = 0;
         HPPanID = 0;
-        for (int i = 0; i < count; i++)
-        {
-            Destroy(instPans[i]);
-            Destroy(instBoxes[i]);
-        }
         instPans = new GameObject[leng];
         pansPos = new Vector2[leng];
         instBoxes = new GameObject[leng];
@@ -159,32 +164,98 @@ public class SnapScrolling : MonoBehaviour
             countRight = 0;
             countWrong = 0;
         }
-        if (contentRect.anchoredPosition.x > pansPos[0].x + 1 || contentRect.anchoredPosition.x < pansPos[count - 1].x - 1) scrollRect.horizontal = false;
-        else scrollRect.horizontal = true;
-        float nearestPos = float.MaxValue;
-        for (int i = 0; i < count; i++)
+
+        if (Input.GetMouseButtonDown(0) && !isScrolling)
         {
-            float distance = Mathf.Abs(contentRect.anchoredPosition.x - pansPos[i].x);
-            if (distance < nearestPos)
+            Ray ray1 = cam.ScreenPointToRay(Input.mousePosition);
+            startPos = ray1.GetPoint(10f);
+            panning = true;
+        }
+        if (panning)
+        {
+            if (Input.GetMouseButton(0))
             {
-                nearestPos = distance;
-                selectedPanID = i;
+                Ray ray3 = cam.ScreenPointToRay(Input.mousePosition);
+                Vector2 nowPos = ray3.GetPoint(10f);
+                if ((selectedPanID == count - 1 && nowPos.x - startPos.x < 0) || (selectedPanID == 0 && nowPos.x - startPos.x > 0))
+                {
+                    scrollRect.horizontal = false;
+                    return;
+                }
+                else
+                {
+                    scrollRect.horizontal = true;
+                }
+            }
+            else
+            {
+                scrollRect.horizontal = true;
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0) && isScrolling)
+        {
+            scrollRect.horizontal = true;
+            panning = false;
+            Ray ray2 = cam.ScreenPointToRay(Input.mousePosition);
+            endPos = ray2.GetPoint(10f);
+
+
+            if ((endPos.x - startPos.x) < -0.1f && (endPos.x - startPos.x) > -3.0f)
+            {
+                if (selectedPanID < count - 1 && prevSelectedPanID == selectedPanID)
+                {
+                    selectedPanID++;
+                }
+            }
+            else if ((endPos.x - startPos.x) < -3.0f)
+            {
+                float nearestPos = float.MaxValue;
+                for (int i = 0; i < count; i++)
+                {
+                    float distance = Mathf.Abs(contentRect.anchoredPosition.x - pansPos[i].x);
+                    if (distance < nearestPos)
+                    {
+                        nearestPos = distance;
+                        selectedPanID = i;
+                    }
+                }
+            }
+            if ((endPos.x - startPos.x) > 0.1f && (endPos.x - startPos.x) < 3.0f)
+            {
+                if (selectedPanID > 0 && prevSelectedPanID == selectedPanID)
+                {
+                    selectedPanID--;
+                }
+            }
+            else if ((endPos.x - startPos.x) > 3.0f)
+            {
+                float nearestPos = float.MaxValue;
+                for (int i = 0; i < count; i++)
+                {
+                    float distance = Mathf.Abs(contentRect.anchoredPosition.x - pansPos[i].x);
+                    if (distance < nearestPos)
+                    {
+                        nearestPos = distance;
+                        selectedPanID = i;
+                    }
+                }
             }
         }
         if (isScrolling) return;
         if (boxRect[count - 1] > panOffset - 5)
         {
-            if (Mathf.Abs(boxContentRect.anchoredPosition.x) > boxRect[count - 1] - panOffset + boxOffset + 5) 
+            if (Mathf.Abs(boxContentRect.anchoredPosition.x) > boxRect[count - 1] - panOffset + boxOffset + 5)
             {
                 boxScrollRect.horizontal = false;
-                boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, -boxRect[count - 1] + panOffset - boxOffset , snapSpeed * Time.fixedDeltaTime);
+                boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, -boxRect[count - 1] + panOffset - boxOffset, snapSpeed * Time.fixedDeltaTime);
                 boxContentRect.anchoredPosition = boxContentVector;
             }
             else boxScrollRect.horizontal = true;
         }
         if (boxContentRect.anchoredPosition.x > 5)
         {
-            
+
             boxContentVector.x = Mathf.SmoothStep(boxContentRect.anchoredPosition.x, boxRect[0], snapSpeed * Time.fixedDeltaTime);
             boxContentRect.anchoredPosition = boxContentVector;
         }
@@ -232,8 +303,16 @@ public class SnapScrolling : MonoBehaviour
             }
             else
             {
-                contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
-                contentRect.anchoredPosition = contentVector;
+                if (Mathf.Abs(contentRect.anchoredPosition.x - pansPos[selectedPanID].x) < snapSpeed)
+                {
+                    contentVector.x = pansPos[selectedPanID].x;
+                    contentRect.anchoredPosition = contentVector;
+                }
+                else
+                {
+                    contentVector.x = Mathf.SmoothStep(contentRect.anchoredPosition.x, pansPos[selectedPanID].x, snapSpeed * Time.fixedDeltaTime);
+                    contentRect.anchoredPosition = contentVector;
+                }
             }
         }
         prevSelectedPanID = selectedPanID;
@@ -307,6 +386,7 @@ public class SnapScrolling : MonoBehaviour
         {
             contentRect.anchoredPosition = new Vector2(pansPos[index].x - boxOffset, 0);
         }
+        selectedPanID = index;
     }
 
     public void OnClickToStartExam()
