@@ -20,6 +20,10 @@ public class SnapScrolling : MonoBehaviour
     private Vector2[] pansPos;
     private RectTransform contentRect;
     private Vector2 contentVector;
+    [HideInInspector]
+    public float kh;
+    [HideInInspector]
+    public float kw;
 
 
     [Header("Box")]
@@ -118,6 +122,8 @@ public class SnapScrolling : MonoBehaviour
         anim = TicketObj.GetComponent<Animator>();
         boxContentRect = BoxParentTransform.GetComponent<RectTransform>();
         panOffset = Screen.width;
+        kw = (float)Screen.width / 500.0f;
+        kh = (float)Screen.height / 800.0f;
         boxOffset = Mathf.FloorToInt((float)Screen.width / 500.0f * (float)50);
         boxScrollRect = BoxParentTransform.GetComponentInParent<ScrollRect>();
         contentRect = content.GetComponent<RectTransform>();
@@ -398,7 +404,7 @@ public class SnapScrolling : MonoBehaviour
         int i = 0;
         while (i < 4)
         {
-            int randTheme = Random.Range(1, 5);
+            int randTheme = Random.Range(0, 5);
             if (indexTheme[randTheme] == 0)
             {
                 int randQuestion = Random.Range(0, theme[randTheme].Questions.ToArray().Length - 5);
@@ -424,7 +430,7 @@ public class SnapScrolling : MonoBehaviour
         int i = 0;
         while (i < 20)
         {
-            int randTheme = Random.Range(1, 4);
+            int randTheme = Random.Range(0, 4);
             int randQuestion = Random.Range(0, theme[randTheme].Questions.ToArray().Length);
             if (indexTheme[randTheme] == 0 || indexQuestions[randQuestion] == 0)
             {
@@ -444,7 +450,7 @@ public class SnapScrolling : MonoBehaviour
         isExam = false;
         int indexTheme = indexAll / 10;
         int index = indexAll % 10;
-        ticket = theme[indexTheme].Questions.ToArray();
+        ticket = theme[indexTheme-1].Questions.ToArray();
         if (ticket.Length - 20 * index <= 0) return;
         if (ticket.Length <= 20 * (index + 1))
         {
