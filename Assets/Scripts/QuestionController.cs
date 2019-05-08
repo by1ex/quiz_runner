@@ -69,6 +69,18 @@ public class QuestionController : MonoBehaviour
             texture.LoadImage(bytes);
             sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
         }
+#elif !UNITY_EDITOR
+        var file = new FileInfo(pathFile);
+        if (file.Exists)
+        {
+            bytes = File.ReadAllBytes(pathFile);
+            texture = new Texture2D(750, 290, TextureFormat.DXT1, false, true);
+            texture.LoadImage(bytes);
+            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+        }
+        else
+        {
+        }
 #endif
         QuestionImage.sprite = sprite;
         yield break;

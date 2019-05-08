@@ -12,6 +12,7 @@ public class JsonParsing : MonoBehaviour
 
     private void Start()
     {
+        Screen.SetResolution(500, 800,false);
         json = Application.streamingAssetsPath + "/questions.json";
 
         if (File.Exists(json))
