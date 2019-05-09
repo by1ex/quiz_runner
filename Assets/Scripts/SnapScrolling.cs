@@ -135,6 +135,8 @@ public class SnapScrolling : MonoBehaviour
 
     private void Fill(int leng)
     {
+        countWrong = 0;
+        countRight = 0;
         selectedPanID = 0;
         HPPanID = 0;
         instPans = new GameObject[leng];
@@ -445,28 +447,30 @@ public class SnapScrolling : MonoBehaviour
         HeaderText.text = "Случайный билет";
     }
 
-    public void OnClickToStartTheme(int indexAll)
+    public void OnClickToStartTheme(int index)
     {
         isExam = false;
+        int indexOutput = index % 100;
+        int indexAll = index / 100;
         int indexTheme = indexAll / 10;
-        int index = indexAll % 10;
+        int indexQ = indexAll % 10;
         ticket = theme[indexTheme-1].Questions.ToArray();
-        if (ticket.Length - 20 * index <= 0) return;
-        if (ticket.Length <= 20 * (index + 1))
+        if (ticket.Length - 20 * indexQ <= 0) return;
+        if (ticket.Length <= 20 * (indexQ + 1))
         {
-            questions = new Questions[ticket.Length - 20 * index];
-            for (int i = index * 20, j = 0; i < ticket.Length; i++, j++)
+            questions = new Questions[ticket.Length - 20 * indexQ];
+            for (int i = indexQ * 20, j = 0; i < ticket.Length; i++, j++)
                 questions[j] = ticket[i];
         }
-        else if (ticket.Length > 20 * (index + 1))
+        else if (ticket.Length > 20 * (indexQ + 1))
         {
             questions = new Questions[20];
-            for (int i = 20 * (index), j = 0; j < 20; i++, j++)
+            for (int i = 20 * (indexQ), j = 0; j < 20; i++, j++)
                 questions[j] = ticket[i];
         }
         Fill(questions.Length);
         anim.SetBool("Active", true);
-        HeaderText.text = "Тема: " + indexTheme.ToString() + " Билет: " + (index + 1).ToString();
+        HeaderText.text = "Тема: " + indexOutput.ToString() + " Билет: " + (indexQ + 1).ToString();
     }
 
     public void Scrolling(bool scroll)
