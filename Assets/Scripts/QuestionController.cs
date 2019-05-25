@@ -42,6 +42,21 @@ public class QuestionController : MonoBehaviour
         Destroy(sprite);
     }
 
+    public int LoadSpriteTest(string imageName)
+    {
+        path = Path.Combine(Application.streamingAssetsPath, folder);
+        string pathFile = Path.Combine(path, imageName + ".jpg");
+        var file = new FileInfo(pathFile);
+        if (file.Exists)
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
     IEnumerator LoadSprite(string imageName)
     {
         byte[] bytes = null;
