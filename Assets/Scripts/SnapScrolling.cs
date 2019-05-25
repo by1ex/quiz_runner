@@ -10,7 +10,7 @@ public class SnapScrolling : MonoBehaviour
     private GameObject timerObj;
     public float startingTime;
 
-    private int count=0;
+    private int count = 0;
     [Header("Main")]
     public Transform content;
     private GameObject[] instPans;
@@ -44,7 +44,7 @@ public class SnapScrolling : MonoBehaviour
     private int HPPanID;
     private int prevSelectedPanID;
 
-    private bool isScrolling;
+    public bool isScrolling;
 
     //animator controller for animation Ticket
     public GameObject TicketObj;
@@ -54,6 +54,8 @@ public class SnapScrolling : MonoBehaviour
     public GameObject winObj;
     private Animator winAnim;
 
+    private int[] indexThemes;
+    private int[] indexQuestion;
     private Questions[] questions;
     private Questions[] ticket;
     private Ticket[] theme;
@@ -78,14 +80,12 @@ public class SnapScrolling : MonoBehaviour
 
     private bool panning;
 
-
-
     IEnumerator Timer()
     {
         yield return new WaitForSeconds(0.4f);
-        Destroy(instPans[selectedPanID]);
         for (int i = 0; i < count; i++)
         {
+            Destroy(instPans[i]);
             Destroy(instBoxes[i]);
         }
         contentRect.anchoredPosition = new Vector2(0, 0);
@@ -101,6 +101,7 @@ public class SnapScrolling : MonoBehaviour
             if (i == selectedPanID) continue;
             Destroy(instPans[i]);
         }
+        Camera.main.GetComponent<JsonParsing>().WriteStats();
         anim.SetBool("Active", false);
         winAnim.SetBool("Active", false);
         StartCoroutine("Timer");
@@ -135,6 +136,11 @@ public class SnapScrolling : MonoBehaviour
 
     private void Fill(int leng)
     {
+        for (int i = 0; i < count; i++)
+        {
+            Destroy(instBoxes[i]);
+            Destroy(instPans[i]);
+        }
         countWrong = 0;
         countRight = 0;
         selectedPanID = 0;
@@ -151,6 +157,8 @@ public class SnapScrolling : MonoBehaviour
             int tmp = i;
             instBoxes[i].GetComponent<Button>().onClick.AddListener(() => OnClick(tmp));
             instPans[i].GetComponent<QuestionController>().question = questions[i];
+            instPans[i].GetComponent<QuestionController>().indexTheme = indexThemes[i];
+            instPans[i].GetComponent<QuestionController>().indexQuestions = indexQuestion[i];
             imagesBoxes[i] = instBoxes[i].GetComponent<Image>();
             if (i == 0) continue;
             instBoxes[i].transform.localPosition = new Vector2(instBoxes[i - 1].transform.localPosition.x + boxOffset, instBoxes[i - 1].transform.localPosition.y);
@@ -387,7 +395,7 @@ public class SnapScrolling : MonoBehaviour
     {
         if (index > selectedPanID)
         {
-            contentRect.anchoredPosition = new Vector2(pansPos[index].x + boxOffset, 0); 
+            contentRect.anchoredPosition = new Vector2(pansPos[index].x + boxOffset, 0);
             if (selectedPanID == 0) HPPanID = index;
         }
         else if (index < selectedPanID)
@@ -403,10 +411,12 @@ public class SnapScrolling : MonoBehaviour
         timer.Starting(startingTime);
         int[] indexTheme = new int[29];
         questions = new Questions[20];
+        indexThemes = new int[20];
+        indexQuestion = new int[20];
         int i = 0;
         while (i < 4)
         {
-            int randTheme = Random.Range(0, 5);
+            int randTheme = Random.Range(0, 26);
             if (indexTheme[randTheme] == 0)
             {
                 int randQuestion = Random.Range(0, theme[randTheme].Questions.ToArray().Length - 5);
@@ -417,6 +427,11 @@ public class SnapScrolling : MonoBehaviour
                 }
                 i++;
             }
+        }
+        for (i = 0; i < 20; i++)
+        {
+            indexThemes[i] = -1;
+            indexQuestion[i] = -1;
         }
         Fill(questions.Length);
         anim.SetBool("Active", true);
@@ -429,16 +444,20 @@ public class SnapScrolling : MonoBehaviour
         int[] indexTheme = new int[29];
         int[] indexQuestions = new int[200];
         questions = new Questions[20];
+        indexThemes = new int[20];
+        indexQuestion = new int[20];
         int i = 0;
         while (i < 20)
         {
-            int randTheme = Random.Range(0, 4);
+            int randTheme = Random.Range(0, 26);
             int randQuestion = Random.Range(0, theme[randTheme].Questions.ToArray().Length);
             if (indexTheme[randTheme] == 0 || indexQuestions[randQuestion] == 0)
             {
                 indexTheme[randTheme] = 1;
                 indexQuestions[randQuestion] = 1;
                 questions[i] = theme[randTheme].Questions[randQuestion];
+                indexThemes[i] = -1;
+                indexQuestion[i] = -1;
                 i++;
             }
         }
@@ -454,19 +473,31 @@ public class SnapScrolling : MonoBehaviour
         int indexAll = index / 100;
         int indexTheme = indexAll / 10;
         int indexQ = indexAll % 10;
-        ticket = theme[indexTheme-1].Questions.ToArray();
+        ticket = theme[indexTheme - 1].Questions.ToArray();
         if (ticket.Length - 20 * indexQ <= 0) return;
         if (ticket.Length <= 20 * (indexQ + 1))
         {
             questions = new Questions[ticket.Length - 20 * indexQ];
+            indexThemes = new int[ticket.Length - 20 * indexQ];
+            indexQuestion = new int[ticket.Length - 20 * indexQ];
             for (int i = indexQ * 20, j = 0; i < ticket.Length; i++, j++)
+            {
                 questions[j] = ticket[i];
+                indexThemes[j] = indexTheme - 1;
+                indexQuestion[j] = i;
+            }
         }
         else if (ticket.Length > 20 * (indexQ + 1))
         {
             questions = new Questions[20];
+            indexThemes = new int[20];
+            indexQuestion = new int[20];
             for (int i = 20 * (indexQ), j = 0; j < 20; i++, j++)
+            {
                 questions[j] = ticket[i];
+                indexThemes[j] = indexTheme - 1;
+                indexQuestion[j] = i;
+            }
         }
         Fill(questions.Length);
         anim.SetBool("Active", true);

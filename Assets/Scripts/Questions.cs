@@ -6,4 +6,5 @@ public  class Questions
     public string text;
     public string[] opt;
     public int answer;
+    public int stats;
 }

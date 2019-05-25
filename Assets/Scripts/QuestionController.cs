@@ -10,6 +10,10 @@ public class QuestionController : MonoBehaviour
     public Sprite Right;
     public Sprite Wrong;
 
+    public int indexTheme;
+    public int indexQuestions;
+    private JsonParsing jsonP;
+
     public Questions question;
     public Text Question;
     public GameObject[] answer;
@@ -90,6 +94,7 @@ public class QuestionController : MonoBehaviour
 
     void Start()
     {
+        jsonP = Camera.main.GetComponent<JsonParsing>();
         path = Path.Combine(Application.streamingAssetsPath, folder);
         snap = GetComponentInParent<SnapScrolling>();
         answerInt = question.answer;
@@ -135,8 +140,15 @@ public class QuestionController : MonoBehaviour
 
     public void OnClick(int index)
     {
+        if (snap.isScrolling)
+        {
+            return;
+        }
         if (index == answerInt)
         {
+            if (indexTheme != -1 && indexQuestions != -1)
+                jsonP.Theme[indexTheme].Questions.ToArray()[indexQuestions].stats = 1;
+
             for (int i = 0; i < question.opt.Length; i++)
                 answer[i].GetComponent<Button>().interactable = false;
             if (!snap.isExam)
@@ -152,6 +164,9 @@ public class QuestionController : MonoBehaviour
         }
         else
         {
+            if (indexTheme != -1 && indexQuestions != -1)
+                jsonP.Theme[indexTheme].Questions.ToArray()[indexQuestions].stats = 2;
+
             for (int i = 0; i < question.opt.Length; i++)
             {
                 answer[i].GetComponent<Button>().interactable = false;
