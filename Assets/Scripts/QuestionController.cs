@@ -31,7 +31,7 @@ public class QuestionController : MonoBehaviour
     private Texture2D texture;
     private Sprite sprite;
 
-    private int answerInt;
+    public int answerInt;
 
     private string path;
     public string folder = "images";
@@ -40,6 +40,21 @@ public class QuestionController : MonoBehaviour
     {
         Destroy(texture);
         Destroy(sprite);
+    }
+
+    public int LoadSpriteTest(string imageName)
+    {
+        path = Path.Combine(Application.streamingAssetsPath, folder);
+        string pathFile = Path.Combine(path, imageName + ".jpg");
+        var file = new FileInfo(pathFile);
+        if (file.Exists)
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
     }
 
     IEnumerator LoadSprite(string imageName)
@@ -135,6 +150,22 @@ public class QuestionController : MonoBehaviour
             answer[i].GetComponentInChildren<Text>().fontSize = Mathf.RoundToInt((float)answer[i].GetComponentInChildren<Text>().fontSize * snap.kw);
             int t = i + 1;
             answer[i].GetComponent<Button>().onClick.AddListener(() => OnClick(t));
+        }
+    }
+
+    public int OnClickTest(int index)
+    {
+        if (index > answer.Length || index < 0)
+        {
+            return 0;
+        }
+        else if (index == answerInt)
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
         }
     }
 

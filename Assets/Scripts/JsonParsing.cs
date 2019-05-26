@@ -59,6 +59,19 @@ public class JsonParsing : MonoBehaviour
         stats.Upload(Theme);
     }
 
+    public int PathJsonTest(string name)
+    {
+        path = Path.Combine(Application.streamingAssetsPath, name);
+        if (File.Exists(path))
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
     private void Start()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
