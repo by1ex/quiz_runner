@@ -8,6 +8,7 @@ public class StatsContoller : MonoBehaviour
     public Text Header;
     public Text Stats;
     public Text Time;
+    public SnapScrolling Snap;
 
     private Sprite tmpSprite;
     public Image Result;
@@ -27,6 +28,13 @@ public class StatsContoller : MonoBehaviour
             Result.sprite = tmpSprite;
         }
         Stats.text = "Результат: " + positive.ToString() + " / " + count.ToString();
-        Time.text =  "Время: " + string.Format("{00:00}:{01:00}", (int)(time / 60), (int)(time % 60));
+        if (Snap.isExam)
+        {
+            Time.text = "Время: " + string.Format("{00:00}:{01:00}", (int)(time / 60), (int)(time % 60));
+        }
+        else
+        {
+            Time.text = "";
+        }
     }
 }
